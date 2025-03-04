@@ -21,6 +21,7 @@ const generateRandomString = function() {
 
 app.use(express.urlencoded({ extended: true })); //middleware which will translate, or parse the body
 
+//create a new short URL once the form is submitted
 app.post("/urls", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
   const newId = generateRandomString();
@@ -29,9 +30,17 @@ app.post("/urls", (req, res) => {
   } else {
     urlDatabase[newId] = `http://${req.body['longURL']}`;
   }
-  console.log(urlDatabase);
+  //console.log(urlDatabase);
   res.redirect(`/urls/${newId}`);
 });
+
+//delete a URL
+app.post("/urls/:id/delete", (req, res) => {
+  const id = req.params.id;
+  delete urlDatabase[id]; // Remove the url  from the object
+  res.redirect("/urls"); // Redirect back to the urls page
+});
+
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -53,7 +62,6 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
-
 
 app.get("/urls/:id", (req, res) => {
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
