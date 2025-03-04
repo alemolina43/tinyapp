@@ -30,7 +30,7 @@ app.post("/urls", (req, res) => {
     urlDatabase[newId] = `http://${req.body['longURL']}`;
   }
   console.log(urlDatabase);
-  res.redirect(`urls/${newId}`);
+  res.redirect(`/urls/${newId}`);
 });
 
 app.get("/", (req, res) => {
