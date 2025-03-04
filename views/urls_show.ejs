@@ -8,6 +8,7 @@
       integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
       crossorigin="anonymous"
     />
+    <%- include('partials/_header') %>
     <title>URL - TinyApp Example</title>
   </head>
 
@@ -19,7 +20,6 @@
         <p class="card-text">
           Short URL ID: <a href="/u/<%= id %>"><%= id %></a>
         </p>
-        <a href = "#">Create new URL</a>
       </div>
       <div class="card-footer text-muted"></div>
     </div>

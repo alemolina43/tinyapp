@@ -15,6 +15,7 @@
       crossorigin="anonymous"
     />
     <title>TinyApp</title>
+    <%- include('partials/_header') %>
   </head>
   <body>
     <main style="margin: 1em;">
@@ -33,7 +34,6 @@
               <td><%= urls[id] %></td>
             </tr>
           <% } %>
-          <a href = "#">Create new URL</a>
         </tbody>
       </table>
     </main>
