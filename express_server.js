@@ -110,11 +110,7 @@ app.get("/u/:id", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  const {email, password} = req.body;
-  const templateVars = {
-    email, password
-  };
-  res.render("register", templateVars);
+  res.render("register");
 });
 
 app.listen(PORT, () => {
