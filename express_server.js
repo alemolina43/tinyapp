@@ -1,5 +1,7 @@
 const express = require("express");
 let cookieParser = require('cookie-parser');
+const { generateRandomString, createNewUser } = require("./helpers/registerHelpers");
+const users = require("./data/usersData");
 const app = express();
 const PORT = 8080; // default port 8080
 
@@ -11,23 +13,13 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com",
 };
 
-const generateRandomString = function() {
-  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  const length = 6;
-  let id = "";
-
-  for (let i = 0; i < length; i++) {
-    id += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return id;
-};
 
 app.use(express.urlencoded({ extended: true })); //middleware which will translate, or parse the body
 
 //create a new short URL once the form is submitted
 app.post("/urls", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
-  const newId = generateRandomString();
+  const newId = generateRandomString(6);
   if (req.body['longURL'].startsWith("http://")) {
     urlDatabase[newId] = req.body['longURL'];
   } else {
@@ -77,18 +69,20 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  //console.log('Cookies: ', req.cookies);
-  //Cookies:  { username: 'vanillaice' }
+  const userId = req.cookies["user_id"];
+  const user = users[userId];
+  const urls = urlDatabase;
   const templateVars = {
-    urls: urlDatabase,
-    username: req.cookies["username"]
+    user, urls
   };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
+  const userId = req.cookies["user_id"];
+  const user = users[userId];
   const templateVars = {
-    username: req.cookies["username"],
+    user
   };
   res.render("urls_new", templateVars);
 });
@@ -113,6 +107,23 @@ app.get("/register", (req, res) => {
   res.render("register");
 });
 
+app.post("/register", (req, res) => {
+  // Create new user
+  const { error, data: newUser } = createNewUser(users, req.body);
+
+  if (error) {
+    res.cookie("errorMessage", error);  // Set error cookie
+    return res.redirect("/register");   // Redirect back to the register page
+  }
+
+  // If no error, set a cookie with the user id and redirect to /urls
+  res.cookie("user_id", newUser.id);  // Use newUser.id here
+  res.redirect("/urls");  // Redirect to the /urls page
+});
+  
+
+
+
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`); //This will allow the server to "listen" to requests
+  console.log(`Tiny app listening on port ${PORT}!`); //This will allow the server to "listen" to requests
 });
