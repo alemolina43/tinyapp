@@ -19,6 +19,9 @@
         <!--display username in navbar-->
         <%if(username) {%>
         <span class="nav-item nav-link text-white">Login as <%= username %>!</span>
+        <form method="POST" action="/logout" class="d-flex ms-auto">
+        <button type="submit" class="btn btn-primary">Logout</button>
+      </form>
         <%} else {%>
          <form method="POST" action="/login" class="d-flex ms-auto">
           <input type="text" name="username" placeholder="username">
