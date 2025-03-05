@@ -48,6 +48,11 @@ app.post("/urls/:id", (req, res) => {
   res.redirect("/urls"); // Redirect back to the URLs page
 });
 
+app.post("/login", (req, res) => {
+  const username = req.body.username;
+  res.cookie('username', username);//set cookie
+  res.redirect("/urls"); // Redirect back to the URLs page
+});
 
 app.get("/", (req, res) => {
   res.send("Hello!");
