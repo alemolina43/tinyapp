@@ -59,7 +59,7 @@ app.post("/login", (req, res) => {
 
 app.post("/logout", (req, res) => {
   const username = req.body.username;
-  res.clearCookie('username', username);//set cookie
+  res.clearCookie('username');//clear the cookie
   res.redirect("/urls"); // Redirect back to the URLs page fro now
 });
 
