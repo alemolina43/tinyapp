@@ -11,7 +11,22 @@ const generateRandomString = function(chars) {
   return id;
 };
 
+const getUserByEmail = (users, email) => {
+  for (let user in users) {
+    if (users[user].email === email) {
+      return users[user];
+    }
+  }
+  return null;
+};
+
 const createNewUser = (users, newUserData) => {
+  const existingUser = getUserByEmail(users, newUserData.email);
+
+  if (existingUser) {
+    return { error: "Email already exists", data: null };
+  }
+
   const newId = generateRandomString(3);
 
   const newUser = {
@@ -22,20 +37,16 @@ const createNewUser = (users, newUserData) => {
 
   // Add new user to users object
   users[newId] = newUser;
-
+  //console.log(users);
   // Check for invalid user data
   const isInvalidUser = Object.values(newUser).filter((value) => value === "").length > 0;
 
   if (isInvalidUser) {
     return { error: "Empty field", data: null };
   }
-
+  
   return { error: null, data: newUser };  // Return the new user data if no error
 };
 
 
-
-
-
-
-module.exports = { generateRandomString, createNewUser};
+module.exports = { generateRandomString, createNewUser, getUserByEmail};

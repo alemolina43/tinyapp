@@ -1,6 +1,6 @@
 const express = require("express");
 let cookieParser = require('cookie-parser');
-const { generateRandomString, createNewUser } = require("./helpers/registerHelpers");
+const { generateRandomString, createNewUser, fetchUserByEmail } = require("./helpers/registerHelpers");
 const users = require("./data/usersData");
 const app = express();
 const PORT = 8080; // default port 8080
@@ -110,15 +110,17 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   // Create new user
   const { error, data: newUser } = createNewUser(users, req.body);
+  console.log(error, newUser);
 
   if (error) {
-    res.cookie("errorMessage", error);  // Set error cookie
-    return res.redirect("/register");   // Redirect back to the register page
+    return res.status(400).send(error);
   }
-
-  // If no error, set a cookie with the user id and redirect to /urls
-  res.cookie("user_id", newUser.id);  // Use newUser.id here
+  
+ 
+  // Set a cookie with the user id and redirect to /urls
+  res.cookie("user_id", newUser.id);  // set a cookie with the user.id
   res.redirect("/urls");  // Redirect to the /urls page
+  //console.log(users);
 });
   
 
