@@ -1,6 +1,7 @@
+//require external resources
 const express = require("express");
 let cookieParser = require('cookie-parser');
-const { generateRandomString, createNewUser, authenticateUser, urlsForUSer } = require("./helpers/registerHelpers");
+const { generateRandomString, createNewUser, authenticateUser, urlsForUSer } = require("./helpers/helperFunctions");
 const users = require("./data/usersData");
 const urlDatabase = require("./data/urlsData");
 const app = express();
@@ -60,7 +61,6 @@ app.post("/login", (req, res) => {
   const userEmail = req.body.email;
   const userPassword = req.body.password;
   const existingUser = authenticateUser(userEmail, userPassword);
-  
   if (existingUser.error) {
     return res.status(403).send(existingUser.error);
   }
@@ -76,6 +76,20 @@ app.post("/login", (req, res) => {
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
   res.redirect("/login"); // Redirect back to the login page
+});
+
+app.post("/register", (req, res) => {
+  // Create new user
+  const { error, data: newUser } = createNewUser(users, req.body);
+  //console.log(newUser);
+  if (error) {
+    return res.status(400).send(error);
+  }
+  users[newUser.id] = newUser;
+  // Set a cookie with the user id and redirect to /urls
+  res.cookie("user_id", newUser.id);  // set a cookie with the user.id
+  res.redirect("/urls");  // Redirect to the /urls page
+  //console.log(users);
 });
 
 app.get("/", (req, res) => {
@@ -162,19 +176,6 @@ app.get("/register", (req, res) => {
   res.render("register", templateVars);
 });
 
-app.post("/register", (req, res) => {
-  // Create new user
-  const { error, data: newUser } = createNewUser(users, req.body);
-  // console.log(newUser);
-  if (error) {
-    return res.status(400).send(error);
-  }
-  users[newUser.id] = newUser;
-  // Set a cookie with the user id and redirect to /urls
-  res.cookie("user_id", newUser.id);  // set a cookie with the user.id
-  res.redirect("/urls");  // Redirect to the /urls page
-  //console.log(users);
-});
 
 app.get("/login", (req, res) => {
   if (req.cookies["user_id"] !== undefined) {

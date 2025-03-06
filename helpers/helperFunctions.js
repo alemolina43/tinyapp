@@ -1,9 +1,10 @@
 const users = require("../data/usersData");
 const urlDatabase = require("../data/urlsData");
+const bcrypt = require("bcryptjs");
 
-const generateRandomString = function(chars) {
+const generateRandomString = function(num) {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  const length = chars;
+  const length = num;
   let id = "";
 
   for (let i = 0; i < length; i++) {
@@ -33,9 +34,9 @@ const createNewUser = (users, newUserData) => {
   const newUser = {
     id: newId,
     email: newUserData.email,
-    password: newUserData.password,
+    password: bcrypt.hashSync(newUserData.password, 10)
   };
-
+  console.log(newUser);
   // Add new user to users object
   // users[newId] = newUser;
   //console.log(users);
@@ -55,7 +56,11 @@ const authenticateUser = (email, password) => {
   if (!user) {
     return { error: errorMessage, data: null };
   }
-  if (user.password !== password) {
+
+  //compare hashed passwords
+  const isSamePassword = bcrypt.compareSync(password, user.password);
+
+  if (!isSamePassword) {
     return { error: errorMessage, data: null };
   }
 
@@ -65,7 +70,7 @@ const authenticateUser = (email, password) => {
 const urlsForUSer = (id) => {
   let userURLs = {};
   for (let urlID in urlDatabase) {
-    console.log('urlID ', urlID);
+    //console.log('urlID ', urlID);
     if (urlDatabase[urlID].userID === id) {
       userURLs[urlID] = { longURL: urlDatabase[urlID].longURL, userID: id};
     }
