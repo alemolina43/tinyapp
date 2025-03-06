@@ -1,4 +1,5 @@
 const users = require("../data/usersData");
+const urlDatabase = require("../data/urlsData");
 
 const generateRandomString = function(chars) {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -61,5 +62,15 @@ const authenticateUser = (email, password) => {
   return { error: null, data: user };
 };
 
+const urlsForUSer = (id) => {
+  let userURLs = {};
+  for (let urlID in urlDatabase) {
+    console.log('urlID ', urlID);
+    if (urlDatabase[urlID].userID === id) {
+      userURLs[urlID] = { longURL: urlDatabase[urlID].longURL, userID: id};
+    }
+  }
+  return userURLs;
+};
 
-module.exports = { generateRandomString, createNewUser, getUserByEmail, authenticateUser };
+module.exports = { generateRandomString, createNewUser, getUserByEmail, authenticateUser, urlsForUSer };

@@ -1,17 +1,14 @@
 const express = require("express");
 let cookieParser = require('cookie-parser');
-const { generateRandomString, createNewUser, getUserByEmail, authenticateUser } = require("./helpers/registerHelpers");
+const { generateRandomString, createNewUser, authenticateUser, urlsForUSer } = require("./helpers/registerHelpers");
 const users = require("./data/usersData");
+const urlDatabase = require("./data/urlsData");
 const app = express();
 const PORT = 8080; // default port 8080
 
 app.use(cookieParser());
 app.set("view engine", "ejs"); //set EJS as the view engine
 
-const urlDatabase = {
-  b2xVn2: "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com",
-};
 
 
 app.use(express.urlencoded({ extended: true })); //middleware which will translate, or parse the body
@@ -19,15 +16,17 @@ app.use(express.urlencoded({ extended: true })); //middleware which will transla
 //create a new short URL once the form is submitted
 app.post("/urls", (req, res) => {
   if (req.cookies["user_id"] === undefined) {
-    res.status(400).send("<html><body>You need to be loged in to use this API.</body></html>\n");
+    return res.status(400).send("<html><body>You need to be loged in to use this API.</body></html>\n");
   }
   
   //console.log(req.body); // Log the POST request body to the console
   const newId = generateRandomString(6);
+  urlDatabase[newId].userID = req.cookies["user_id"];
+  
   if (req.body['longURL'].startsWith("http://")) {
-    urlDatabase[newId] = req.body['longURL'];
+    urlDatabase[newId].longURL = req.body['longURL'];
   } else {
-    urlDatabase[newId] = `http://${req.body['longURL']}`;
+    urlDatabase[newId].longURL = `http://${req.body['longURL']}`;
   }
   //console.log(urlDatabase);
   res.redirect(`/urls/${newId}`);
@@ -36,6 +35,10 @@ app.post("/urls", (req, res) => {
 //delete a URL
 app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
+  const userId = req.cookies["user_id"];
+  if (urlDatabase[id].userID !== userId) {
+    return res.status(400).send("<html><body>You don't own this shortURL.</body></html>\n");
+  }
   delete urlDatabase[id]; // Remove the url  from the object
   res.redirect("/urls"); // Redirect back to the urls page
 });
@@ -43,8 +46,13 @@ app.post("/urls/:id/delete", (req, res) => {
 //update an existing URL
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
+  const userId = req.cookies["user_id"];
+  if (urlDatabase[id].userID !== userId) {
+    return res.status(400).send("<html><body>You don't own this shortURL.</body></html>\n");
+  }
+
   const newLongURL = req.body.longURL;
-  urlDatabase[id] = newLongURL;
+  urlDatabase[id].longURL = newLongURL;
   res.redirect("/urls"); // Redirect back to the URLs page
 });
 
@@ -83,9 +91,15 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
+  if (req.cookies["user_id"] === undefined) {
+    return res.status(400).send("<html><body>You need to be loged in to use this API.</body></html>\n");
+  }
+
   const userId = req.cookies["user_id"];
   const user = users[userId];
-  const urls = urlDatabase;
+    
+  
+  const urls = urlsForUSer(userId);
   const templateVars = {
     user, urls
   };
@@ -106,22 +120,30 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
+  if (req.cookies["user_id"] === undefined) {
+    return res.status(400).send("<html><body>You need to be loged in to use this API.</body></html>\n");
+  }
+  
   const id = req.params.id;
   const userId = req.cookies["user_id"];
+  if (urlDatabase[id].userID !== userId) {
+    return  res.status(400).send("<html><body>You don't own this shortURL.</body></html>\n");
+  }
+  
   const user = users[userId];
 
   const templateVars = {
     id,
-    longURL: urlDatabase[id],
+    longURL: urlDatabase[id].longURL,
     user,
   };
   res.render("urls_show", templateVars);
 });
 
 app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.id];
+  const longURL = urlDatabase[req.params.id].longURL;
   if (longURL === undefined) {
-    res.status(400).send("<html><body>The short URL does not exists. </body></html>\n");
+    return res.status(400).send("<html><body>The short URL does not exists. </body></html>\n");
   }
   
   //const username = req.cookies["username"];
@@ -143,7 +165,7 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   // Create new user
   const { error, data: newUser } = createNewUser(users, req.body);
-  console.log(newUser);
+  // console.log(newUser);
   if (error) {
     return res.status(400).send(error);
   }
