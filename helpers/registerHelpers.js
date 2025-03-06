@@ -36,7 +36,7 @@ const createNewUser = (users, newUserData) => {
   };
 
   // Add new user to users object
-  users[newId] = newUser;
+  // users[newId] = newUser;
   //console.log(users);
   // Check for invalid user data
   const isInvalidUser = Object.values(newUser).filter((value) => value === "").length > 0;
@@ -48,5 +48,19 @@ const createNewUser = (users, newUserData) => {
   return { error: null, data: newUser };  // Return the new user data if no error
 };
 
+const authenticateUser = (email, password) => {
+  const user = getUserByEmail(users, email);
+  const errorMessage = "Incorrect user/password";
+  if (!user) {
+    return { error: errorMessage, data: null };
+  }
+  console.log(user.password);
+  if (user.password !== password) {
+    return { error: errorMessage, data: null };
+  }
 
-module.exports = { generateRandomString, createNewUser, getUserByEmail};
+  return { error: null, data: user };
+};
+
+
+module.exports = { generateRandomString, createNewUser, getUserByEmail, authenticateUser };

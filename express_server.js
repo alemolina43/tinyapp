@@ -1,6 +1,6 @@
 const express = require("express");
 let cookieParser = require('cookie-parser');
-const { generateRandomString, createNewUser } = require("./helpers/registerHelpers");
+const { generateRandomString, createNewUser, getUserByEmail, authenticateUser } = require("./helpers/registerHelpers");
 const users = require("./data/usersData");
 const app = express();
 const PORT = 8080; // default port 8080
@@ -45,14 +45,27 @@ app.post("/urls/:id", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  const username = req.body.username;
-  res.cookie('username', username);//set cookie
-  res.redirect("/urls"); // Redirect back to the URLs page
+  const userEmail = req.body.email;
+  const userPassword = req.body.password;
+  const existingUser = authenticateUser(userEmail, userPassword);
+  
+  if (existingUser.error) {
+    // res.redirect("/register");
+    return res.status(403).send(existingUser.error);
+
+  }
+
+  if (existingUser.data) {
+    res.cookie("user_id", existingUser.data.id);  // set a cookie with the user.id
+    res.redirect("/urls");
+  }
+  //console.log(req.body);
+  
 });
 
 app.post("/logout", (req, res) => {
-  const userId = req.cookies["user_id"];
-  res.redirect("/login"); // Redirect back to the login page fro now
+  res.clearCookie("user_id");
+  res.redirect("/login"); // Redirect back to the login page
 });
 
 app.get("/", (req, res) => {
@@ -88,10 +101,13 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:id", (req, res) => {
   const id = req.params.id;
+  const userId = req.cookies["user_id"];
+  const user = users[userId];
+
   const templateVars = {
     id,
     longURL: urlDatabase[id],
-    username: req.cookies["username"],
+    user,
   };
   res.render("urls_show", templateVars);
 });
@@ -103,19 +119,25 @@ app.get("/u/:id", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  res.render("register");
+  if (req.cookies["user_id"] !== undefined) {
+    res.redirect("urls");
+  }
+  const user = null;
+
+  const templateVars = {
+    user
+  };
+  res.render("register", templateVars);
 });
 
 app.post("/register", (req, res) => {
   // Create new user
   const { error, data: newUser } = createNewUser(users, req.body);
-  console.log(error, newUser);
-
+  console.log(newUser);
   if (error) {
     return res.status(400).send(error);
   }
-
- 
+  users[newUser.id] = newUser;
   // Set a cookie with the user id and redirect to /urls
   res.cookie("user_id", newUser.id);  // set a cookie with the user.id
   res.redirect("/urls");  // Redirect to the /urls page
@@ -123,7 +145,13 @@ app.post("/register", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  res.render("login");
+  const user = null;
+
+  const templateVars = {
+    user
+  };
+        
+  res.render("login", templateVars);
 });
 
 
