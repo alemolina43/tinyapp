@@ -54,7 +54,6 @@ const authenticateUser = (email, password) => {
   if (!user) {
     return { error: errorMessage, data: null };
   }
-  console.log(user.password);
   if (user.password !== password) {
     return { error: errorMessage, data: null };
   }
