@@ -37,11 +37,11 @@ Welcome to the **Tiny App** full stack app! 🎉 It was built with Node and Expr
 
 ## Final Product
 
-!["Main URLs page"](https://github.com/alemolina43/tinyapp/blob/feature/user-registration/docs/myUrls.png?raw=true)
-!["Register Page"](https://github.com/alemolina43/tinyapp/blob/feature/user-registration/docs/Register.png?raw=true)
-!["Login Page"](https://github.com/alemolina43/tinyapp/blob/feature/user-registration/docs/Register.png?raw=true)
-!["Create tiny URL"](https://github.com/alemolina43/tinyapp/blob/feature/user-registration/docs/Create_tinyURL.png?raw=true)
-!["Tiny URL page"](https://github.com/alemolina43/tinyapp/blob/feature/user-registration/docs/Edit_redirect_TURL.png?raw=true)
+!["Main URLs page"](https://raw.githubusercontent.com/alemolina43/tinyapp/refs/heads/master/docs/myUrls.png)
+!["Register Page"](https://raw.githubusercontent.com/alemolina43/tinyapp/refs/heads/master/docs/Register.png)
+!["Login Page"](https://raw.githubusercontent.com/alemolina43/tinyapp/refs/heads/master/docs/Login.png)
+!["Create tiny URL"](https://raw.githubusercontent.com/alemolina43/tinyapp/refs/heads/master/docs/Create_tinyURL.png)
+!["Tiny URL page"](https://raw.githubusercontent.com/alemolina43/tinyapp/refs/heads/master/docs/Edit_redirect_TURL.png)
 
 ## Getting Started
 
