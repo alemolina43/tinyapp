@@ -1,5 +1,5 @@
-const users = require("../data/usersData");
-const urlDatabase = require("../data/urlsData");
+const users = require("../data/users");
+const urlDatabase = require("../data/urlsDatabase");
 
 const generateRandomString = function(chars) {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -21,20 +21,16 @@ const getUserByEmail = (users, email) => {
   return null;
 };
 
-const createNewUser = (users, newUserData) => {
-  const existingUser = getUserByEmail(users, newUserData.email);
+const createNewUser = (email, password) => {
+  const existingUser = getUserByEmail(users, email);
 
   if (existingUser) {
     return { error: "Email already exists", data: null };
   }
 
-  const newId = generateRandomString(3);
+  const id = generateRandomString(3);
 
-  const newUser = {
-    id: newId,
-    email: newUserData.email,
-    password: newUserData.password,
-  };
+  const newUser = { id, email, password };
 
   // Add new user to users object
   // users[newId] = newUser;
@@ -62,15 +58,19 @@ const authenticateUser = (email, password) => {
   return { error: null, data: user };
 };
 
-const urlsForUSer = (id) => {
+const urlsForUser = (userId) => {
   let userURLs = {};
-  for (let urlID in urlDatabase) {
-    console.log('urlID ', urlID);
-    if (urlDatabase[urlID].userID === id) {
-      userURLs[urlID] = { longURL: urlDatabase[urlID].longURL, userID: id};
+  const ids = Object.keys(urlDatabase);
+  console.log(urlDatabase);
+  console.log(userId);
+
+  for (const id of ids) {
+    const url = urlDatabase[id];
+    if (url.userID === userId) {
+      userURLs[id] = { ...url };
     }
   }
   return userURLs;
 };
 
-module.exports = { generateRandomString, createNewUser, getUserByEmail, authenticateUser, urlsForUSer };
+module.exports = { generateRandomString, createNewUser, getUserByEmail, authenticateUser, urlsForUser };
