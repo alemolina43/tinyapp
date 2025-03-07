@@ -215,7 +215,14 @@ app.get("/login", (req, res) => {
 
 //HOME ROUTE
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  if (!req.session.user_id) {
+    return res.redirect("login");
+  }
+  
+  if (req.session.user_id) {
+    return res.redirect("urls");
+  }
+
 });
 
 
