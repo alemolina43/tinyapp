@@ -1,22 +1,37 @@
+//require external resources
 const express = require("express");
-const cookieParser = require('cookie-parser');
+//const cookieParser = require('cookie-parser'); is replaced by cookieSession
+const cookieSession = require("cookie-session");
+
+//set up data and helpers
 const { generateRandomString, createNewUser, authenticateUser, urlsForUser } = require("./helpers");
 const users = require("./data/users");
 const urlDatabase = require("./data/urlsDatabase");
+
+//initialize my server
 const app = express();
 const PORT = 8080; // default port 8080
-
-app.use(cookieParser());
 app.set("view engine", "ejs"); //set EJS as the view engine
 
+// Parse the content of cookie string to a cookie object (Parsing/Rendering/Interpreting)
+//app.use(cookieParser()); replace by cookieSession
 
+// Encrypt / Decrypt the content of the "session" cookie
+app.use(
+  cookieSession({
+    keys: ["Hola, yo voy a protegerte"],
+    name: "session",
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  })
+);
 
+//parse the content of the from body into an object
 app.use(express.urlencoded({ extended: true })); //middleware which will translate, or parse the body
 
 //REST API CRUD users
 //create a new short URL once the form is submitted
 app.post("/urls", (req, res) => {
-  const userID = req.cookies.user_id;
+  const userID = req.session.user_id;
   const user = users[userID];
   if (!user) {
     return res.status(400).send("You need to be loged in to use this API.");
@@ -57,7 +72,7 @@ app.get("/u/:id", (req, res) => {
 //update an existing URL
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
-  const userID = req.cookies.user_id;
+  const userID = req.session.user_id;
   const user = users[userID];
   if (!user) {
     return res.status(400).send("You need to be loged in to use this API.");
@@ -75,7 +90,7 @@ app.post("/urls/:id", (req, res) => {
 //delete a URL
 app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
-  const userId = req.cookies["user_id"];
+  const userId = req.session.user_id;
   if (urlDatabase[id].userID !== userId) {
     return res.status(400).send("<html><body>You don't own this shortURL.</body></html>\n");
   }
@@ -86,14 +101,18 @@ app.post("/urls/:id/delete", (req, res) => {
 //VIEWS URLS
 //URLs index
 app.get("/urls", (req, res) => {
-  if (!req.cookies["user_id"]) {
+  
+  if (!req.session.user_id) {
     return res.status(400).send("You need to be loged in to use this API.");
   }
-
-  const userId = req.cookies["user_id"];
+  
+  const userId = req.session.user_id;
   const user = users[userId];
-  
-  
+
+  if (!user) {
+    return res.redirect("/login");  // Redirect if user doesn't exist
+  }
+    
   const urls = urlsForUser(userId);
   const templateVars = { user, urls };
   res.render("urls_index", templateVars);
@@ -101,11 +120,11 @@ app.get("/urls", (req, res) => {
 
 //URLs new
 app.get("/urls/new", (req, res) => {
-  if (req.cookies["user_id"] === undefined) {
+  if (!req.session.user_id) {
     res.redirect("/login");
   }
 
-  const userId = req.cookies["user_id"];
+  const userId = req.session.user_id;
   const user = users[userId];
   const templateVars = {
     user
@@ -115,7 +134,7 @@ app.get("/urls/new", (req, res) => {
 
 //URLs show
 app.get("/urls/:id", (req, res) => {
-  const userId = req.cookies["user_id"];
+  const userId = req.session.user_id;
   const user = users[userId];
   if (!user) {
     return res.status(400).send("You need to be loged in to use this API.");
@@ -145,10 +164,9 @@ app.post("/register", (req, res) => {
     return res.status(400).send(error);
   }
   users[newUser.id] = newUser;
-  // Set a cookie with the user id and redirect to /urls
-  res.cookie("user_id", newUser.id);  // set a cookie with the user.id
+  req.session.user_id = newUser.id;  // store the user ID in the session
+  
   res.redirect("/urls");  // Redirect to the /urls page
-
 });
 
 //login
@@ -162,7 +180,7 @@ app.post("/login", (req, res) => {
   }
 
   if (existingUser.data) {
-    res.cookie("user_id", existingUser.data.id);  // set a cookie with the user.id
+    req.session.user_id = existingUser.data.id;  // store user ID in session
     res.redirect("/urls");
   }
   
@@ -170,14 +188,14 @@ app.post("/login", (req, res) => {
 
 //logout
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id");
+  req.session = {}; //there is no clear cookie so we set value to null;
   res.redirect("/login"); // Redirect back to the login page
 });
 
 //VIEWS AUTH
 app.get("/register", (req, res) => {
-  if (req.cookies["user_id"] !== undefined) {
-    res.redirect("urls");
+  if (req.session.user_id) {
+    return res.redirect("urls");
   }
   const user = null;
 
@@ -188,7 +206,7 @@ app.get("/register", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  if (req.cookies["user_id"]) {
+  if (!req.session.user_id) {
     return res.redirect("urls");
   }
           
