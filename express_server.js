@@ -63,14 +63,12 @@ app.post("/urls/:id", (req, res) => {
     return res.status(400).send("You need to be loged in to use this API.");
   }
   const url = urlDatabase[id];
-  console.log(url);
   if (url.userID !== userID) {
     return res.status(400).send("You don't own this shortURL.");
   }
 
   const newLongURL = req.body.longURL;
   url.longURL = newLongURL;
-  console.log(url);
   res.redirect("/urls"); // Redirect back to the URLs page
 });
 
@@ -97,7 +95,6 @@ app.get("/urls", (req, res) => {
   
   
   const urls = urlsForUser(userId);
-  console.log(urls);
   const templateVars = { user, urls };
   res.render("urls_index", templateVars);
 });
@@ -134,8 +131,7 @@ app.get("/urls/:id", (req, res) => {
     return res.status(400).send("You don't own this shortURL.");
   }
   const templateVars = {url, user, id };
-  console.log(url);
-
+  
   res.render("urls_show", templateVars);
 });
 
