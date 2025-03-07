@@ -4,12 +4,12 @@ Welcome to the **Tiny App** full stack app! 🎉 It was built with Node and Expr
 
 ## Table of Contents
 
-- What it does.
-- Features.
-- Dependencies.
-- Final Product.
-- Getting Started.
-- Testing.
+- [What it does](#what-it-does)
+- [Features](#features)
+- [Dependencies](#dependencies)
+- [Final Product](#final-product)
+- [Getting Started](#getting-started)
+- [Testing](#testing)
 
 ## What it does
 
@@ -37,8 +37,11 @@ Welcome to the **Tiny App** full stack app! 🎉 It was built with Node and Expr
 
 ## Final Product
 
-!["screenshot description"](#)
-!["screenshot description"](#)
+!["Main URLs page"](https://github.com/alemolina43/tinyapp/blob/feature/user-registration/docs/myUrls.png?raw=true)
+!["Register Page"](https://github.com/alemolina43/tinyapp/blob/feature/user-registration/docs/Register.png?raw=true)
+!["Login Page"](https://github.com/alemolina43/tinyapp/blob/feature/user-registration/docs/Register.png?raw=true)
+!["Create tiny URL"](https://github.com/alemolina43/tinyapp/blob/feature/user-registration/docs/Create_tinyURL.png?raw=true)
+!["Tiny URL page"](https://github.com/alemolina43/tinyapp/blob/feature/user-registration/docs/Edit_redirect_TURL.png?raw=true)
 
 ## Getting Started
 
@@ -50,3 +53,10 @@ Welcome to the **Tiny App** full stack app! 🎉 It was built with Node and Expr
   - node express_server.js
 - Access the app by opening your browser and navigating to:
   - http://localhost:8080
+
+## Testing
+
+- Mocha & Chai: This app uses Mocha and Chai for testing. Run the tests by executing the following command:
+  - npm test
+- Test functions: The helper functions are tested to ensure they handle edge cases like no URLs or invalid users properly. 💻
+- Automated testing: Unit tests validate the functionality of the URL shortening process and user authentication. ✅
