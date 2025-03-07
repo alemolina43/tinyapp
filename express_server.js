@@ -4,7 +4,7 @@ const express = require("express");
 const cookieSession = require("cookie-session");
 
 //set up data and helpers
-const { generateRandomString, createNewUser, authenticateUser, urlsForUser } = require("./helpers/helpers");
+const { generateRandomString, createNewUser, authenticateUser, urlsForUser } = require("./helpers");
 const users = require("./data/users");
 const urlDatabase = require("./data/urlsDatabase");
 

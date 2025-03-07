@@ -1,5 +1,5 @@
-const users = require("../data/users");
-const urlDatabase = require("../data/urlsDatabase");
+const users = require("./data/users");
+const urlDatabase = require("./data/urlsDatabase");
 const bcrypt = require("bcryptjs");
 
 const generateRandomString = function(chars) {
