@@ -45,7 +45,7 @@ const createNewUser = (email, password) => {
 
 const authenticateUser = (email, password) => {
   const user = getUserByEmail(users, email);
-  const errorMessage = "Incorrect user/password";
+  const errorMessage = "Incorrect user/password"; //adding an extra step of security by not sending specific message
   if (!user) {
     return { error: errorMessage, data: null };
   }
