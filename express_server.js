@@ -33,7 +33,7 @@ app.use(express.urlencoded({ extended: true })); //middleware which will transla
 app.post("/urls", (req, res) => {
   const userID = req.session.user_id;
   const user = users[userID];
-  if (!user) {
+  if (!userID) {
     return res.status(400).send("You need to be loged in to use this API.");
   }
 
@@ -62,7 +62,7 @@ app.get("/urls.json", (req, res) => {
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id].longURL;
   if (longURL === undefined) {
-    return res.status(400).send("<html><body>The short URL does not exists. </body></html>\n");
+    return res.status(400).send("The short URL does not exists.");
   }
   
   //const username = req.cookies["username"];
@@ -92,7 +92,7 @@ app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
   const userId = req.session.user_id;
   if (urlDatabase[id].userID !== userId) {
-    return res.status(400).send("<html><body>You don't own this shortURL.</body></html>\n");
+    return res.status(400).send("You don't own this shortURL.");
   }
   delete urlDatabase[id]; // Remove the url  from the object
   res.redirect("/urls"); // Redirect back to the urls page
@@ -188,8 +188,8 @@ app.post("/login", (req, res) => {
 
 //logout
 app.post("/logout", (req, res) => {
-  req.session.user_id = {}; //there is no clear cookie so we set value to an empty object (null will fail for redirection);
-  res.redirect("/login"); // Redirect back to the login page
+  req.session = null; //there is no clear cookie so we set value to an empty object (null will fail for redirection);
+  return res.redirect("/login"); // Redirect back to the login page
 });
 
 //VIEWS AUTH
@@ -206,7 +206,7 @@ app.get("/register", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  if (!req.session.user_id) {
+  if (req.session.user_id) {
     return res.redirect("urls");
   }
           
