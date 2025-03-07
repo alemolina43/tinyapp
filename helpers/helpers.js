@@ -19,7 +19,7 @@ const getUserByEmail = (users, email) => {
       return users[user];
     }
   }
-  return null;
+  return undefined;
 };
 
 const createNewUser = (email, password) => {
