@@ -45,14 +45,13 @@ Welcome to the **Tiny App** full stack app! 🎉 It was built with Node and Expr
 
 ## Getting Started
 
-- Clone the repository using the command:
-- clone the repo 💅🏻
+- Clone the repo 💅🏻
 - Install all dependencies by running:
-  - npm install
+  `npm install`
 - Run the development web server:
-  - node express_server.js
+   `node express_server.js`
 - Access the app by opening your browser and navigating to:
-  - http://localhost:8080
+    `http://localhost:8080`
 
 ## Testing
 
